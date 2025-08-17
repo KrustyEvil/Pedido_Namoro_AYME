@@ -60,11 +60,3 @@
   animation: bounce 2s infinite;
 }
 
-/* App.css */
-.audio-button {
-  transition: all 0.3s ease;
-  transform: scale(1);
-}
-.audio-button:hover {
-  transform: scale(1.1);
-}

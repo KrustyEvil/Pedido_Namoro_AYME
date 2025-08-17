@@ -10,41 +10,53 @@ function App() {
   const [audioPlaying, setAudioPlaying] = useState(false);
   const audioRef = useRef(null);
 
-  // Efeito para tentar reproduzir a música automaticamente
+  // Solução melhorada para autoplay
   useEffect(() => {
-    const playAudio = async () => {
-      try {
-        await audioRef.current?.play();
-        setAudioPlaying(true);
-      } catch (err) {
-        console.log("Reprodução automática bloqueada:", err);
+    // Cria um handler de interação do usuário
+    const handleUserInteraction = () => {
+      if (!audioPlaying && audioRef.current) {
+        audioRef.current.play()
+          .then(() => {
+            setAudioPlaying(true);
+            document.removeEventListener('click', handleUserInteraction);
+          })
+          .catch(e => console.log("Erro ao tocar música:", e));
       }
     };
-    playAudio();
-  }, []);
+
+    // Adiciona listener para o primeiro clique em qualquer lugar da página
+    document.addEventListener('click', handleUserInteraction);
+    
+    return () => {
+      document.removeEventListener('click', handleUserInteraction);
+    };
+  }, [audioPlaying]);
 
   const handleSimClick = () => {
+    // Efeitos visuais
     confetti({
       particleCount: 300,
       spread: 100,
       origin: { y: 0.6 }
     });
+    
     setAceitou(true);
     
-    // Toca a música novamente ao aceitar (caso tenha sido bloqueada)
-    if (!audioPlaying) {
-      audioRef.current?.play();
-      setAudioPlaying(true);
+    // Força a reprodução ao clicar em SIM
+    if (audioRef.current && !audioPlaying) {
+      audioRef.current.play()
+        .then(() => setAudioPlaying(true))
+        .catch(e => console.log("Erro ao tocar:", e));
     }
   };
 
   return (
     <div className="app min-h-screen bg-gradient-to-b from-pink-50 to-rose-100 flex flex-col items-center justify-center p-4">
-      {/* Player de áudio oculto */}
+      {/* Player de áudio - corrigido o caminho */}
       <audio 
-        ref={audioRef} 
+        ref={audioRef}
         loop
-        src="/musica.mp3"  // Use o nome exato do seu arquivo
+        src="musica.mp3"  // Atualizado para o nome correto do seu arquivo
         className="hidden"
       />
       
@@ -67,16 +79,17 @@ function App() {
         </div>
       )}
 
-      {/* Botão de controle de áudio (só aparece se a música não tocar sozinha) */}
+      {/* Botão de fallback melhorado */}
       {!audioPlaying && (
         <button 
           onClick={() => {
-            audioRef.current?.play();
-            setAudioPlaying(true);
+            audioRef.current?.play()
+              .then(() => setAudioPlaying(true))
+              .catch(e => console.log("Erro ao tocar:", e));
           }}
-          className="fixed bottom-4 right-4 bg-rose-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-rose-700 transition-colors"
+          className="fixed bottom-4 right-4 bg-rose-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-rose-700 transition-colors animate-pulse"
         >
-          🔈 Tocar música
+          🔈 Clique para ativar a música
         </button>
       )}
     </div>
