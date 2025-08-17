@@ -40,3 +40,31 @@
 .read-the-docs {
   color: #888;
 }
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+.animate-pulse {
+  animation: pulse 2s infinite;
+}
+
+/* Efeito de flutuação para a mensagem de aceitação */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
+}
+
+.animate-bounce {
+  animation: bounce 2s infinite;
+}
+
+/* App.css */
+.audio-button {
+  transition: all 0.3s ease;
+  transform: scale(1);
+}
+.audio-button:hover {
+  transform: scale(1.1);
+}

@@ -1,14 +1,10 @@
-import { motion } from 'framer-motion'
+const BotaoSim = ({ onClick }) => (
+  <button
+    onClick={onClick}
+    className="px-8 py-4 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-2xl font-bold rounded-full shadow-lg hover:shadow-xl transition-all transform hover:scale-105 active:scale-95"
+  >
+    💖 SIM! 💖
+  </button>
+);
 
-export default function BotaoSim({ onClick }) {
-  return (
-    <motion.button
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.98 }}
-      onClick={onClick}
-      className="px-7 py-3 rounded-2xl bg-rose-600 text-white font-semibold shadow-lg hover:bg-rose-700"
-    >
-      Sim 💘
-    </motion.button>
-  )
-}
+export default BotaoSim;

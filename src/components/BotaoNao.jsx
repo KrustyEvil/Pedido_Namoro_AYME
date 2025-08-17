@@ -1,38 +1,33 @@
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react';
 
-function aleatorioEntre(min, max) { return Math.random() * (max - min) + min }
+function BotaoNao() {
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [hoverCount, setHoverCount] = useState(0);
 
-export default function BotaoNao({ containerRef }) {
-  const btnRef = useRef(null)
-  const [pos, setPos] = useState({ top: 110, left: 40 })
+  const fugirDoMouse = (e) => {
+    const x = Math.random() * window.innerWidth * 0.7;
+    const y = Math.random() * window.innerHeight * 0.7;
+    setPosition({ x, y });
+    setHoverCount(prev => prev + 1);
+  };
 
-  const fugir = () => {
-    const container = containerRef.current
-    const btn = btnRef.current
-    if (!container || !btn) return
-
-    const cRect = container.getBoundingClientRect()
-    const bRect = btn.getBoundingClientRect()
-    const padding = 8
-    const maxLeft = cRect.width - bRect.width - padding
-    const maxTop = cRect.height - bRect.height - padding
-
-    const novoLeft = Math.max(padding, Math.min(maxLeft, aleatorioEntre(0, maxLeft)))
-    const novoTop = Math.max(padding, Math.min(maxTop, aleatorioEntre(0, maxTop)))
-    setPos({ top: novoTop, left: novoLeft })
-  }
-
-  useEffect(() => { fugir() }, [])
+  const mensagens = [
+    "Tem certeza?",
+    "Pense bem!",
+    "Eu mereço uma chance!",
+    "Clique no SIM!",
+    "Última chance!"
+  ];
 
   return (
     <button
-      ref={btnRef}
-      onMouseEnter={fugir}
-      onTouchStart={fugir}
-      style={{ position: 'absolute', top: pos.top, left: pos.left }}
-      className="px-4 py-2 rounded-2xl bg-gray-200 text-gray-700 shadow hover:bg-gray-300 transition select-none"
+      style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
+      onMouseEnter={fugirDoMouse}
+      className="px-8 py-4 bg-gray-200 text-gray-700 text-xl font-semibold rounded-full absolute transition-all duration-300 hover:bg-gray-300"
     >
-      Não
+      {hoverCount < mensagens.length ? mensagens[hoverCount] : "Ok, vou pro SIM!"}
     </button>
-  )
+  );
 }
+
+export default BotaoNao;
