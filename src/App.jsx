@@ -7,57 +7,52 @@ import './App.css';
 
 function App() {
   const [aceitou, setAceitou] = useState(false);
-  const [audioPlaying, setAudioPlaying] = useState(false);
+  const [userInteracted, setUserInteracted] = useState(false);
   const audioRef = useRef(null);
 
-  // Solução melhorada para autoplay
+  // Contorna bloqueio de autoplay
   useEffect(() => {
-    // Cria um handler de interação do usuário
-    const handleUserInteraction = () => {
-      if (!audioPlaying && audioRef.current) {
+    const handleInteraction = () => {
+      if (!userInteracted && audioRef.current) {
         audioRef.current.play()
           .then(() => {
-            setAudioPlaying(true);
-            document.removeEventListener('click', handleUserInteraction);
+            setUserInteracted(true);
+            document.removeEventListener('click', handleInteraction);
           })
-          .catch(e => console.log("Erro ao tocar música:", e));
+          .catch(e => console.log("Autoplay bloqueado:", e));
       }
     };
 
-    // Adiciona listener para o primeiro clique em qualquer lugar da página
-    document.addEventListener('click', handleUserInteraction);
-    
-    return () => {
-      document.removeEventListener('click', handleUserInteraction);
-    };
-  }, [audioPlaying]);
+    document.addEventListener('click', handleInteraction);
+    return () => document.removeEventListener('click', handleInteraction);
+  }, [userInteracted]);
 
   const handleSimClick = () => {
+    // Ativa a música se ainda não tiver iniciado
+    if (!userInteracted) {
+      audioRef.current.play()
+        .then(() => setUserInteracted(true))
+        .catch(e => console.log("Erro ao tocar:", e));
+    }
+
     // Efeitos visuais
     confetti({
       particleCount: 300,
       spread: 100,
       origin: { y: 0.6 }
     });
-    
     setAceitou(true);
-    
-    // Força a reprodução ao clicar em SIM
-    if (audioRef.current && !audioPlaying) {
-      audioRef.current.play()
-        .then(() => setAudioPlaying(true))
-        .catch(e => console.log("Erro ao tocar:", e));
-    }
   };
 
   return (
     <div className="app min-h-screen bg-gradient-to-b from-pink-50 to-rose-100 flex flex-col items-center justify-center p-4">
-      {/* Player de áudio - corrigido o caminho */}
+      {/* Player de áudio com caminho dinâmico */}
       <audio 
         ref={audioRef}
         loop
-        src="musica.mp3"  // Atualizado para o nome correto do seu arquivo
+        src={`${import.meta.env.BASE_URL || ''}musica.mp3`} // Nome CORRETO do seu arquivo
         className="hidden"
+        muted={!userInteracted} // Importante para contornar bloqueios
       />
       
       {!aceitou ? (
@@ -79,17 +74,17 @@ function App() {
         </div>
       )}
 
-      {/* Botão de fallback melhorado */}
-      {!audioPlaying && (
+      {/* Fallback visível apenas se necessário */}
+      {!userInteracted && (
         <button 
           onClick={() => {
-            audioRef.current?.play()
-              .then(() => setAudioPlaying(true))
-              .catch(e => console.log("Erro ao tocar:", e));
+            audioRef.current.play()
+              .then(() => setUserInteracted(true))
+              .catch(e => console.log("Erro ao ativar:", e));
           }}
           className="fixed bottom-4 right-4 bg-rose-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-rose-700 transition-colors animate-pulse"
         >
-          🔈 Clique para ativar a música
+          🔈 Ativar música
         </button>
       )}
     </div>

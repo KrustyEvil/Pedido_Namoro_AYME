@@ -1,7 +1,19 @@
 const fotos = [
-  { src: "fotos/foto1.jpg", alt: "Nosso primeiro encontro" }, // Removi a barra inicial
-  { src: "fotos/foto2.jpg", alt: "Momento especial" },
-  { src: "fotos/foto3.jpg", alt: "Aventura juntos" },
+  { 
+    src: `${import.meta.env.BASE_URL || './'}fotos/foto1.jpg`, 
+    alt: "Nosso primeiro encontro",
+    fallbackSrc: 'https://via.placeholder.com/300x200?text=Carregando...' 
+  },
+  { 
+    src: `${import.meta.env.BASE_URL || './'}fotos/foto2.jpg`, 
+    alt: "Momento especial",
+    fallbackSrc: 'https://via.placeholder.com/300x200?text=Carregando...'
+  },
+  { 
+    src: `${import.meta.env.BASE_URL || './'}fotos/foto3.jpg`, 
+    alt: "Aventura juntos",
+    fallbackSrc: 'https://via.placeholder.com/300x200?text=Carregando...'
+  },
 ];
 
 function Galeria() {
@@ -15,7 +27,12 @@ function Galeria() {
               src={foto.src} 
               alt={foto.alt}
               className="w-full h-64 object-cover transform group-hover:scale-110 transition-transform duration-500"
-              loading="lazy" // Adicionei lazy loading
+              loading="lazy"
+              onError={(e) => {
+                console.error(`Erro ao carregar: ${foto.src}`);
+                e.target.src = foto.fallbackSrc; // Exibe placeholder se der erro
+                e.target.onerror = null; // Previne loop
+              }}
             />
             <div className="absolute inset-0 bg-black bg-opacity-40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <p className="text-white text-lg font-medium">{foto.alt}</p>
