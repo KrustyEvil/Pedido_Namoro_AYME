@@ -1,33 +1,37 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 
-function BotaoNao() {
-  const [position, setPosition] = useState({ x: 0, y: 0 });
+const BotaoNao = () => {
   const [hoverCount, setHoverCount] = useState(0);
+  const buttonRef = useRef(null);
 
-  const fugirDoMouse = (e) => {
-    const x = Math.random() * window.innerWidth * 0.7;
-    const y = Math.random() * window.innerHeight * 0.7;
-    setPosition({ x, y });
+  const handleInteraction = () => {
     setHoverCount(prev => prev + 1);
+    const button = buttonRef.current;
+    
+    if (button) {
+      const maxX = window.innerWidth - button.offsetWidth - 20;
+      const maxY = window.innerHeight - button.offsetHeight - 20;
+      
+      const randomX = Math.max(10, Math.random() * maxX);
+      const randomY = Math.max(10, Math.random() * maxY);
+      
+      button.style.position = 'absolute';
+      button.style.left = `${randomX}px`;
+      button.style.top = `${randomY}px`;
+      button.style.transition = 'left 0.3s ease-out, top 0.3s ease-out';
+    }
   };
-
-  const mensagens = [
-    "Tem certeza?",
-    "Pense bem!",
-    "Eu mereço uma chance!",
-    "Clique no SIM!",
-    "Última chance!"
-  ];
 
   return (
     <button
-      style={{ transform: `translate(${position.x}px, ${position.y}px)` }}
-      onMouseEnter={fugirDoMouse}
-      className="px-8 py-4 bg-gray-200 text-gray-700 text-xl font-semibold rounded-full absolute transition-all duration-300 hover:bg-gray-300"
+      ref={buttonRef}
+      onMouseEnter={handleInteraction}
+      onTouchStart={handleInteraction}
+      className={`button-no ${hoverCount > 2 ? 'animate-pulse' : ''}`}
     >
-      {hoverCount < mensagens.length ? mensagens[hoverCount] : "Ok, vou pro SIM!"}
+      {hoverCount > 3 ? 'Talvez...' : hoverCount > 1 ? 'Quer mesmo?' : 'Não'}
     </button>
   );
-}
+};
 
 export default BotaoNao;

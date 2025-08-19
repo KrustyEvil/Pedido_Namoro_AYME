@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import BotaoNao from './components/BotaoNao';
 import BotaoSim from './components/BotaoSim';
 import Galeria from './components/Galeria';
@@ -7,85 +7,54 @@ import './App.css';
 
 function App() {
   const [aceitou, setAceitou] = useState(false);
-  const [userInteracted, setUserInteracted] = useState(false);
   const audioRef = useRef(null);
 
-  // Contorna bloqueio de autoplay
-  useEffect(() => {
-    const handleInteraction = () => {
-      if (!userInteracted && audioRef.current) {
-        audioRef.current.play()
-          .then(() => {
-            setUserInteracted(true);
-            document.removeEventListener('click', handleInteraction);
-          })
-          .catch(e => console.log("Autoplay bloqueado:", e));
-      }
-    };
-
-    document.addEventListener('click', handleInteraction);
-    return () => document.removeEventListener('click', handleInteraction);
-  }, [userInteracted]);
-
   const handleSimClick = () => {
-    // Ativa a música se ainda não tiver iniciado
-    if (!userInteracted) {
-      audioRef.current.play()
-        .then(() => setUserInteracted(true))
-        .catch(e => console.log("Erro ao tocar:", e));
+    // Toca a música apenas quando clicar no Sim
+    if (audioRef.current) {
+      audioRef.current.play().catch(e => console.log("Erro ao tocar música:", e));
     }
 
-    // Efeitos visuais
+    // Efeitos de confete
     confetti({
-      particleCount: 300,
-      spread: 100,
-      origin: { y: 0.6 }
+      particleCount: 150,
+      spread: 70,
+      origin: { y: 0.6 },
+      colors: ['#ff1493', '#ff69b4', '#db2777']
     });
+    
     setAceitou(true);
   };
 
   return (
-    <div className="app min-h-screen bg-gradient-to-b from-pink-50 to-rose-100 flex flex-col items-center justify-center p-4">
-      {/* Player de áudio com caminho dinâmico */}
+    <div className="app-container">
+      {/* Elemento de áudio oculto */}
       <audio 
         ref={audioRef}
         loop
-        src={`${import.meta.env.BASE_URL || ''}musica.mp3`} // Nome CORRETO do seu arquivo
+        src={`${import.meta.env.BASE_URL || ''}musica.mp3`}
         className="hidden"
-        muted={!userInteracted} // Importante para contornar bloqueios
       />
       
       {!aceitou ? (
         <>
-          <h1 className="text-4xl md:text-5xl font-bold text-rose-600 mb-8 text-center animate-pulse">
+          <h1 className="main-title animate-fade-in">
             Quer namorar comigo? 💘
           </h1>
-          <div className="flex gap-4 mb-8">
+          
+          <div className="button-group">
             <BotaoSim onClick={handleSimClick} />
             <BotaoNao />
           </div>
-          <p className="text-gray-600 text-sm">* Passe o mouse sobre os corações</p>
+          
+          <p className="text-gray-600 text-sm">* Não aceitar é crime!!!</p>
         </>
       ) : (
-        <div className="text-center animate-bounce">
-          <h2 className="text-5xl font-bold text-rose-600 mb-6">Ebaaa! Você disse SIM! 🎉</h2>
-          <p className="text-xl mb-8">Você acabou de fazer meu dia perfeito! 💖</p>
+        <div className="acceptance-message animate-fade-in">
+          <h2 className="acceptance-title">Ebaaa! Você disse SIM! 🎉</h2>
+          <p className="acceptance-text">Você acabou de fazer meu dia perfeito! 💖</p>
           <Galeria />
         </div>
-      )}
-
-      {/* Fallback visível apenas se necessário */}
-      {!userInteracted && (
-        <button 
-          onClick={() => {
-            audioRef.current.play()
-              .then(() => setUserInteracted(true))
-              .catch(e => console.log("Erro ao ativar:", e));
-          }}
-          className="fixed bottom-4 right-4 bg-rose-600 text-white px-4 py-2 rounded-lg shadow-lg hover:bg-rose-700 transition-colors animate-pulse"
-        >
-          🔈 Ativar música
-        </button>
       )}
     </div>
   );
