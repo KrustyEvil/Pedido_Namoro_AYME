@@ -1,7 +1,7 @@
 const fotos = [
   { 
     src: `${import.meta.env.BASE_URL || './'}fotos/foto1.jpg`, 
-    alt: "Nosso primeiro encontro",
+    alt: "Encontro marcante",
     fallbackSrc: 'https://via.placeholder.com/300x200?text=Carregando...' 
   },
   { 
@@ -11,7 +11,7 @@ const fotos = [
   },
   { 
     src: `${import.meta.env.BASE_URL || './'}fotos/foto3.jpg`, 
-    alt: "Aventura juntos",
+    alt: "Batalhando juntos",
     fallbackSrc: 'https://via.placeholder.com/300x200?text=Carregando...'
   },
 ];
